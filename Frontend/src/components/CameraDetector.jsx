@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://pritha.onrender.com";
 
 function CameraDetector() {
   const videoRef = useRef(null);
@@ -31,14 +31,13 @@ function CameraDetector() {
     try {
       setCameraError("");
 
-      const stream =
-        await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-          },
-          audio: false,
-        });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+        },
+        audio: false,
+      });
 
       streamRef.current = stream;
 
@@ -56,9 +55,7 @@ function CameraDetector() {
     } catch (error) {
       console.error("Camera error:", error);
 
-      setCameraError(
-        "Camera access denied. Please allow camera permission."
-      );
+      setCameraError("Camera access denied. Please allow camera permission.");
     }
   };
 
@@ -73,9 +70,7 @@ function CameraDetector() {
     }
 
     if (streamRef.current) {
-      streamRef.current
-        .getTracks()
-        .forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
 
       streamRef.current = null;
     }
@@ -123,11 +118,7 @@ function CameraDetector() {
       return;
     }
 
-    if (
-      video.readyState < 2 ||
-      !video.videoWidth ||
-      !video.videoHeight
-    ) {
+    if (video.readyState < 2 || !video.videoWidth || !video.videoHeight) {
       return;
     }
 
@@ -145,13 +136,7 @@ function CameraDetector() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    context.drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     canvas.toBlob(
       async (blob) => {
@@ -163,25 +148,16 @@ function CameraDetector() {
 
         const formData = new FormData();
 
-        formData.append(
-          "file",
-          blob,
-          "camera.jpg"
-        );
+        formData.append("file", blob, "camera.jpg");
 
         try {
-          const response = await fetch(
-            `${API_URL}/detect`,
-            {
-              method: "POST",
-              body: formData,
-            }
-          );
+          const response = await fetch(`${API_URL}/detect`, {
+            method: "POST",
+            body: formData,
+          });
 
           if (!response.ok) {
-            throw new Error(
-              `API Error: ${response.status}`
-            );
+            throw new Error(`API Error: ${response.status}`);
           }
 
           const data = await response.json();
@@ -194,21 +170,16 @@ function CameraDetector() {
 
           setCameraError("");
         } catch (error) {
-          console.error(
-            "Detection error:",
-            error
-          );
+          console.error("Detection error:", error);
 
-          setCameraError(
-            "Unable to connect to detection server."
-          );
+          setCameraError("Unable to connect to detection server.");
         } finally {
           detectingRef.current = false;
           setIsDetecting(false);
         }
       },
       "image/jpeg",
-      0.75
+      0.75,
     );
   };
 
@@ -218,40 +189,29 @@ function CameraDetector() {
 
   return (
     <main className="detector-page">
-
       {/* HEADER */}
 
       <header className="top-header">
-
         <div className="brand">
-
-          <div className="brand-icon">
-            AI
-          </div>
+          <div className="brand-icon">AI</div>
 
           <div>
             <h2>SmartVision AI</h2>
             <span>Object Detection System</span>
           </div>
-
         </div>
 
         <div className="live-badge">
           <span className="live-dot"></span>
           LIVE
         </div>
-
       </header>
 
       {/* HERO */}
 
       <section className="hero-section">
-
         <div className="hero-content">
-
-          <span className="eyebrow">
-            ARTIFICIAL INTELLIGENCE
-          </span>
+          <span className="eyebrow">ARTIFICIAL INTELLIGENCE</span>
 
           <h1>
             Real-Time
@@ -259,63 +219,41 @@ function CameraDetector() {
           </h1>
 
           <p>
-            Show an object to the camera and let
-            AI identify it instantly with
+            Show an object to the camera and let AI identify it instantly with
             confidence-based detection.
           </p>
-
         </div>
-
       </section>
 
       {/* ERROR */}
 
-      {cameraError && (
-        <div className="error-message">
-          {cameraError}
-        </div>
-      )}
+      {cameraError && <div className="error-message">{cameraError}</div>}
 
       {/* MAIN DETECTION AREA */}
 
       <section className="detection-layout">
-
         {/* CAMERA CARD */}
 
         <div className="camera-card">
-
           <div className="card-header">
-
             <div>
-              <span className="section-label">
-                LIVE CAMERA
-              </span>
+              <span className="section-label">LIVE CAMERA</span>
 
-              <h2>
-                Detection View
-              </h2>
+              <h2>Detection View</h2>
             </div>
 
             <div
-              className={
-                isCameraOn
-                  ? "status-badge active"
-                  : "status-badge"
-              }
+              className={isCameraOn ? "status-badge active" : "status-badge"}
             >
               <span></span>
 
-              {isCameraOn
-                ? "Camera Active"
-                : "Camera Off"}
+              {isCameraOn ? "Camera Active" : "Camera Off"}
             </div>
-
           </div>
 
           {/* CAMERA */}
 
           <div className="camera-wrapper">
-
             <video
               ref={videoRef}
               autoPlay
@@ -326,314 +264,186 @@ function CameraDetector() {
 
             {/* BOUNDING BOXES */}
 
-            {detections.map(
-              (item, index) => {
+            {detections.map((item, index) => {
+              const video = videoRef.current;
 
-                const video =
-                  videoRef.current;
-
-                if (!video) {
-                  return null;
-                }
-
-                const videoWidth =
-                  video.videoWidth;
-
-                const videoHeight =
-                  video.videoHeight;
-
-                if (
-                  !videoWidth ||
-                  !videoHeight
-                ) {
-                  return null;
-                }
-
-                const left =
-                  (item.x1 /
-                    videoWidth) *
-                  100;
-
-                const top =
-                  (item.y1 /
-                    videoHeight) *
-                  100;
-
-                const width =
-                  ((item.x2 -
-                    item.x1) /
-                    videoWidth) *
-                  100;
-
-                const height =
-                  ((item.y2 -
-                    item.y1) /
-                    videoHeight) *
-                  100;
-
-                return (
-                  <div
-                    key={`${item.name}-${index}`}
-                    className="bounding-box"
-                    style={{
-                      left: `${left}%`,
-                      top: `${top}%`,
-                      width: `${width}%`,
-                      height: `${height}%`,
-                    }}
-                  >
-
-                    <div className="object-label">
-                      <span>
-                        {item.name}
-                      </span>
-
-                      <strong>
-                        {item.confidence}%
-                      </strong>
-                    </div>
-
-                  </div>
-                );
+              if (!video) {
+                return null;
               }
-            )}
+
+              const videoWidth = video.videoWidth;
+
+              const videoHeight = video.videoHeight;
+
+              if (!videoWidth || !videoHeight) {
+                return null;
+              }
+
+              const left = (item.x1 / videoWidth) * 100;
+
+              const top = (item.y1 / videoHeight) * 100;
+
+              const width = ((item.x2 - item.x1) / videoWidth) * 100;
+
+              const height = ((item.y2 - item.y1) / videoHeight) * 100;
+
+              return (
+                <div
+                  key={`${item.name}-${index}`}
+                  className="bounding-box"
+                  style={{
+                    left: `${left}%`,
+                    top: `${top}%`,
+                    width: `${width}%`,
+                    height: `${height}%`,
+                  }}
+                >
+                  <div className="object-label">
+                    <span>{item.name}</span>
+
+                    <strong>{item.confidence}%</strong>
+                  </div>
+                </div>
+              );
+            })}
 
             {/* SCANNING EFFECT */}
 
-            {isDetecting && (
-              <div className="scan-line"></div>
-            )}
-
+            {isDetecting && <div className="scan-line"></div>}
           </div>
 
           {/* CAMERA CONTROLS */}
 
           <div className="camera-controls">
-
             <div className="ai-status">
-
               <span
                 className={
-                  isDetecting
-                    ? "status-light detecting"
-                    : "status-light"
+                  isDetecting ? "status-light detecting" : "status-light"
                 }
               ></span>
 
               <div>
                 <strong>
-                  {isDetecting
-                    ? "Analyzing frame..."
-                    : "AI Detection Active"}
+                  {isDetecting ? "Analyzing frame..." : "AI Detection Active"}
                 </strong>
 
-                <small>
-                  Automatic detection every 1 second
-                </small>
+                <small>Automatic detection every 1 second</small>
               </div>
-
             </div>
 
             {isCameraOn ? (
-              <button
-                className="stop-button"
-                onClick={stopCamera}
-              >
+              <button className="stop-button" onClick={stopCamera}>
                 Stop Camera
               </button>
             ) : (
-              <button
-                className="start-button"
-                onClick={startCamera}
-              >
+              <button className="start-button" onClick={startCamera}>
                 Start Camera
               </button>
             )}
-
           </div>
-
         </div>
 
         {/* SIDE PANEL */}
 
         <aside className="info-panel">
-
           {/* AI STATUS */}
 
           <div className="info-card">
-
             <div className="info-card-top">
               <span>AI ENGINE</span>
 
-              <div className="engine-icon">
-                AI
-              </div>
+              <div className="engine-icon">AI</div>
             </div>
 
-            <h3>
-              YOLO Object Detection
-            </h3>
+            <h3>YOLO Object Detection</h3>
 
-            <p>
-              Real-time computer vision
-              model analyzing your camera
-              feed.
-            </p>
+            <p>Real-time computer vision model analyzing your camera feed.</p>
 
             <div className="engine-status">
               <span></span>
 
-              {isCameraOn
-                ? "System Active"
-                : "System Offline"}
+              {isCameraOn ? "System Active" : "System Offline"}
             </div>
-
           </div>
 
           {/* OBJECT COUNT */}
 
           <div className="info-card">
+            <div className="metric-label">OBJECTS DETECTED</div>
 
-            <div className="metric-label">
-              OBJECTS DETECTED
-            </div>
+            <div className="object-count">{detections.length}</div>
 
-            <div className="object-count">
-              {detections.length}
-            </div>
-
-            <p>
-              Objects currently visible
-              to the AI model.
-            </p>
-
+            <p>Objects currently visible to the AI model.</p>
           </div>
 
           {/* DETECTION SPEED */}
 
           <div className="info-card">
-
-            <div className="metric-label">
-              DETECTION INTERVAL
-            </div>
+            <div className="metric-label">DETECTION INTERVAL</div>
 
             <div className="interval-value">
               1<span> sec</span>
             </div>
 
-            <p>
-              Automatic frame analysis
-            </p>
-
+            <p>Automatic frame analysis</p>
           </div>
-
         </aside>
-
       </section>
 
       {/* RESULTS */}
 
       <section className="results-section">
-
         <div className="results-heading">
-
           <div>
-            <span className="section-label">
-              AI ANALYSIS
-            </span>
+            <span className="section-label">AI ANALYSIS</span>
 
-            <h2>
-              Detected Objects
-            </h2>
+            <h2>Detected Objects</h2>
           </div>
 
           <div className="result-count">
-            {detections.length}{" "}
-            {detections.length === 1
-              ? "Object"
-              : "Objects"}
+            {detections.length} {detections.length === 1 ? "Object" : "Objects"}
           </div>
-
         </div>
 
         {detections.length === 0 ? (
           <div className="empty-state">
+            <div className="empty-icon">AI</div>
 
-            <div className="empty-icon">
-              AI
-            </div>
+            <h3>Waiting for an object</h3>
 
-            <h3>
-              Waiting for an object
-            </h3>
-
-            <p>
-              Place an object in front of
-              the camera to begin detection.
-            </p>
-
+            <p>Place an object in front of the camera to begin detection.</p>
           </div>
         ) : (
           <div className="results-grid">
-
-            {detections.map(
-              (item, index) => (
-                <div
-                  className="result-card"
-                  key={`${item.name}-${index}`}
-                >
-
-                  <div className="result-icon">
-                    {item.name
-                      .charAt(0)
-                      .toUpperCase()}
-                  </div>
-
-                  <div className="result-info">
-
-                    <span>
-                      DETECTED OBJECT
-                    </span>
-
-                    <h3>
-                      {item.name}
-                    </h3>
-
-                  </div>
-
-                  <div className="confidence">
-
-                    <span>
-                      CONFIDENCE
-                    </span>
-
-                    <strong>
-                      {item.confidence}%
-                    </strong>
-
-                  </div>
-
+            {detections.map((item, index) => (
+              <div className="result-card" key={`${item.name}-${index}`}>
+                <div className="result-icon">
+                  {item.name.charAt(0).toUpperCase()}
                 </div>
-              )
-            )}
 
+                <div className="result-info">
+                  <span>DETECTED OBJECT</span>
+
+                  <h3>{item.name}</h3>
+                </div>
+
+                <div className="confidence">
+                  <span>CONFIDENCE</span>
+
+                  <strong>{item.confidence}%</strong>
+                </div>
+              </div>
+            ))}
           </div>
         )}
-
       </section>
 
       {/* FOOTER */}
 
       <footer className="footer">
+        <div>SmartVision AI</div>
 
-        <div>
-          SmartVision AI
-        </div>
-
-        <span>
-          Powered by YOLO + FastAPI + React
-        </span>
-
+        <span>Powered by YOLO + FastAPI + React</span>
       </footer>
 
       {/* HIDDEN CANVAS */}
@@ -644,7 +454,6 @@ function CameraDetector() {
           display: "none",
         }}
       />
-
     </main>
   );
 }
