@@ -1,0 +1,24 @@
+# Python
+Backend/venv/
+Backend/__pycache__/
+Backend/**/*.pyc
+
+# YOLO generated files
+Backend/runs/
+
+# Node
+Frontend/node_modules/
+Frontend/dist/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
