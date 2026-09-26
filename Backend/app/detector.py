@@ -4,26 +4,29 @@ from ultralytics import YOLO
 class ObjectDetector:
 
     def __init__(self):
+        # Load YOLO model
         self.model = YOLO("yolo11n.pt")
 
     def detect(self, image):
 
+        # Run object detection
         results = self.model.predict(
             source=image,
-            conf=0.5,
-            imgsz=320,
-            device="cpu",
+            conf=0.65,
             verbose=False
         )
 
         detections = []
 
+        # Process detection results
         for result in results:
 
             for box in result.boxes:
 
                 confidence = float(box.conf[0])
+
                 class_id = int(box.cls[0])
+
                 name = self.model.names[class_id]
 
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
@@ -40,4 +43,5 @@ class ObjectDetector:
         return detections
 
 
+# Create detector object
 detector = ObjectDetector()
